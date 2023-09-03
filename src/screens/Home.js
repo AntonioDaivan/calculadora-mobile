@@ -10,65 +10,75 @@ import { Container, RowButtonArea, SwitchArea } from "./styles"
 
 export const HomeComponent = ({ toggleTheme }) => {
 
-    const [ isEnable, setIsEnable ] = useState(false)
     const [ displayValue, setDisplayValue ] = useState('0')
-    const [ clearDisplay, setClearDisplay ] = useState(false)
-
+    const [ savedValue, setSavedValue ] = useState(null)
+    const [ functionCalculation, setFunctionCalculation ] = useState(null)
+    const [ operator, setOperator ] = useState(null)
     const { colors, title } = useContext(ThemeContext)
 
-    const calculation = {
-        savedValue: null,
-        functionCalculation: null
+    function operations(operator) {
+        if (typeof operator !== "string") throw Error("Operator must be string")
+        const ops = {
+            "+": (value1, value2) => value1 + value2,
+            "-": (value1, value2) => value1 - value2,
+            "*": (value1, value2) => value1 * value2,
+            "/": (value1, value2) => value2 === 0 ? 0 : (value1 / value2)
+        }
+
+        return ops[operator]
     }
 
-    const addDigit = digit => {
-        const cleanDisplay = displayValue === '0' || clearDisplay
+    function addDigit(digit) {
+        const cleanDisplay = displayValue === '0' || isNaN(displayValue)
 
         const currentValue = cleanDisplay ? '' : displayValue
         setDisplayValue(currentValue + digit)
     }
 
-    const addDot = () => {
+    function addDot() {
         if(displayValue === ' ' || isNaN(displayValue)){setDisplayValue('0.')}
         else if(!displayValue.includes('.')) setDisplayValue(displayValue + '.')
     }
 
-    const sum = (value1, value2) => value1 + value2 
-    const sub = (value1, value2) => value1 - value2 
-    const mult = (value1, value2) => value1 * value2
-    const div = (value1, value2) => {
-        if(value2 == 0) return
-        return value1 / value2
+    function saveFirstValue(){
+        if (savedValue !== null) return
+        setSavedValue(displayValue)
+        saveResultValue(operator)
     }
 
-    const submitOperator = operator => {
-        if(operator === '+'){calculation.functionCalculation = sum}
-        else if(operator === '-'){calculation.functionCalculation = sub}
-        else if(operator === '*'){calculation.functionCalculation = mult}
-        else if(operator === '/'){calculation.functionCalculation = div}
+    function saveResultValue(operator){
+        if (savedValue === null) return
+        setSavedValue(operations(operator)(savedValue, displayValue))
     }
 
-    const returnResult = () => {
-        console.warn('entrou na função')
-        if(calculation.functionCalculation !== null){
-            const result = calculation.functionCalculation(calculation.savedValue, Number(displayValue))
+    function directOperator(operator) {
+        setOperator(operator)
+        if (typeof operator !== "string") throw Error("Operator must be string")
 
-            console.warn(result)
-            setDisplayValue(result)
-            calculation.savedValue = result
-            calculation.functionCalculation = null
-        }
+        setFunctionCalculation(operations(operator))
+        setDisplayValue(operator)
+        saveFirstValue()
     }
 
-    const del = () => {
-        const value = displayValue.slice(0, displayValue.length - 1)
-        !value ? setDisplayValue('0') : setDisplayValue(value)
+    function returnResult(operator) {
+        if(functionCalculation === null) return
+        const result = operations(operator)(Number(savedValue), Number(displayValue))
+
+        setDisplayValue(result)
+        setSavedValue(result)
+        setFunctionCalculation(null)
     }
 
-    const clear = () => {
+    function del() {
+        const value = displayValue.toString().slice(0, displayValue.length - 1)
+        value.length < 1 ? setDisplayValue('0') : setDisplayValue(value)
+        setSavedValue(value)
+    }
+
+    function clear() {
         setDisplayValue('0')
-        calculation.savedValue = null
-        calculation.functionCalculation = null
+        setSavedValue(null)
+        setFunctionCalculation(null)
     }
 
     return(
@@ -93,31 +103,31 @@ export const HomeComponent = ({ toggleTheme }) => {
                 <ButtonComponent value={'C'} color={colors.colorFunctionSecondary} onPress={() => clear('C')}/>
                 <ButtonComponent value={'+/-'} color={colors.colorFunctionSecondary} onPress={() => console.warn('+/-')}/>
                 <ButtonComponent value={'%'} color={colors.colorFunctionSecondary} onPress={() => console.warn('%')}/>
-                <ButtonComponent value={'/'} color={colors.colorFunctionPrimary} onPress={() => submitOperator('/')}/>
+                <ButtonComponent value={'/'} color={colors.colorFunctionPrimary} onPress={() => directOperator('/')}/>
             </RowButtonArea>
             <RowButtonArea>
                 <ButtonComponent value={'7'} onPress={() => addDigit('7')}/>
                 <ButtonComponent value={'8'} onPress={() => addDigit('8')}/>
                 <ButtonComponent value={'9'} onPress={() => addDigit('9')}/>
-                <ButtonComponent value={'*'} color={colors.colorFunctionPrimary} onPress={() => submitOperator('*')}/>
+                <ButtonComponent value={'*'} color={colors.colorFunctionPrimary} onPress={() => directOperator('*')}/>
             </RowButtonArea>
             <RowButtonArea>
                 <ButtonComponent value={'4'} onPress={() => addDigit('4')}/>
                 <ButtonComponent value={'5'} onPress={() => addDigit('5')}/>
                 <ButtonComponent value={'6'} onPress={() => addDigit('6')}/>
-                <ButtonComponent value={'-'} color={colors.colorFunctionPrimary} onPress={() => submitOperator('-')}/>
+                <ButtonComponent value={'-'} color={colors.colorFunctionPrimary} onPress={() => directOperator('-')}/>
             </RowButtonArea>
             <RowButtonArea>
                 <ButtonComponent value={'1'} onPress={() => addDigit('1')}/>
                 <ButtonComponent value={'2'} onPress={() => addDigit('2')}/>
                 <ButtonComponent value={'3'} onPress={() => addDigit('3')}/>
-                <ButtonComponent value={'+'} color={colors.colorFunctionPrimary} onPress={() => submitOperator('+')}/>
+                <ButtonComponent value={'+'} color={colors.colorFunctionPrimary} onPress={() => directOperator('+')}/>
             </RowButtonArea>
             <RowButtonArea>
                 <ButtonComponent value={'0'} onPress={() => addDigit('0')}/>
                 <ButtonComponent value={'.'} onPress={() => addDot('.')}/>
-                <ButtonComponent value={'<-'} onPress={del}/>
-                <ButtonComponent value={'='} color={colors.backgroundEquals} onPress={returnResult}/>
+                <ButtonComponent value={'<'} onPress={del}/>
+                <ButtonComponent value={'='} color={colors.backgroundEquals} onPress={() => returnResult(operator)}/>
             </RowButtonArea>
         </Container>
     )
