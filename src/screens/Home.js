@@ -28,6 +28,14 @@ export const HomeComponent = ({ toggleTheme }) => {
         return ops[operator]
     }
 
+    function percentage(){
+        setDisplayValue(Number(displayValue) / 100 * savedValue)
+    }
+
+    function setPositiveOrNegative(){
+        Number(displayValue) > 0 ? setDisplayValue(-displayValue) : setDisplayValue(Math.abs(displayValue)) 
+    }
+
     function addDigit(digit) {
         const cleanDisplay = displayValue === '0' || isNaN(displayValue)
 
@@ -64,7 +72,7 @@ export const HomeComponent = ({ toggleTheme }) => {
         if(functionCalculation === null) return
         const result = operations(operator)(Number(savedValue), Number(displayValue))
 
-        setDisplayValue(result)
+        setDisplayValue(result.toString())
         setSavedValue(result)
         setFunctionCalculation(null)
     }
@@ -101,33 +109,60 @@ export const HomeComponent = ({ toggleTheme }) => {
 
             <RowButtonArea>
                 <ButtonComponent value={'C'} color={colors.colorFunctionSecondary} onPress={() => clear('C')}/>
-                <ButtonComponent value={'+/-'} color={colors.colorFunctionSecondary} onPress={() => console.warn('+/-')}/>
-                <ButtonComponent value={'%'} color={colors.colorFunctionSecondary} onPress={() => console.warn('%')}/>
-                <ButtonComponent value={'/'} color={colors.colorFunctionPrimary} onPress={() => directOperator('/')}/>
+                <ButtonComponent value={'+/-'} color={colors.colorFunctionSecondary} onPress={setPositiveOrNegative}/>
+                <ButtonComponent 
+                    value={<Icon name="percentage" size={25} />} 
+                    color={colors.colorFunctionSecondary} 
+                    onPress={percentage}
+                />
+                <ButtonComponent 
+                    value={<Icon name="divide" size={25} />} 
+                    color={colors.colorFunctionPrimary} 
+                    onPress={() => directOperator('/')}
+                />
             </RowButtonArea>
             <RowButtonArea>
                 <ButtonComponent value={'7'} onPress={() => addDigit('7')}/>
                 <ButtonComponent value={'8'} onPress={() => addDigit('8')}/>
                 <ButtonComponent value={'9'} onPress={() => addDigit('9')}/>
-                <ButtonComponent value={'*'} color={colors.colorFunctionPrimary} onPress={() => directOperator('*')}/>
+                <ButtonComponent 
+                    value={<Icon name="times" size={25} />}
+                    color={colors.colorFunctionPrimary} 
+                    onPress={() => directOperator('*')}
+                />
             </RowButtonArea>
             <RowButtonArea>
                 <ButtonComponent value={'4'} onPress={() => addDigit('4')}/>
                 <ButtonComponent value={'5'} onPress={() => addDigit('5')}/>
                 <ButtonComponent value={'6'} onPress={() => addDigit('6')}/>
-                <ButtonComponent value={'-'} color={colors.colorFunctionPrimary} onPress={() => directOperator('-')}/>
+                <ButtonComponent 
+                    value={<Icon name="minus" size={25} />} 
+                    color={colors.colorFunctionPrimary} 
+                    onPress={() => directOperator('-')}
+                />
             </RowButtonArea>
             <RowButtonArea>
                 <ButtonComponent value={'1'} onPress={() => addDigit('1')}/>
                 <ButtonComponent value={'2'} onPress={() => addDigit('2')}/>
                 <ButtonComponent value={'3'} onPress={() => addDigit('3')}/>
-                <ButtonComponent value={'+'} color={colors.colorFunctionPrimary} onPress={() => directOperator('+')}/>
+                <ButtonComponent 
+                    value={<Icon name="plus" size={25} />}
+                    color={colors.colorFunctionPrimary} 
+                    onPress={() => directOperator('+')}
+                />
             </RowButtonArea>
             <RowButtonArea>
                 <ButtonComponent value={'0'} onPress={() => addDigit('0')}/>
                 <ButtonComponent value={'.'} onPress={() => addDot('.')}/>
-                <ButtonComponent value={'<'} onPress={del}/>
-                <ButtonComponent value={'='} color={colors.backgroundEquals} onPress={() => returnResult(operator)}/>
+                <ButtonComponent 
+                    value={<Icon name="backspace" size={25} />} 
+                    onPress={del}
+                />
+                <ButtonComponent 
+                    value={<Icon name="equals" size={25} />} 
+                    color={colors.backgroundEquals} 
+                    onPress={() => returnResult(operator)}
+                />
             </RowButtonArea>
         </Container>
     )
