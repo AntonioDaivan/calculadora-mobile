@@ -11,6 +11,7 @@ import { Container, RowButtonArea, SwitchArea } from "./styles"
 export const HomeComponent = ({ toggleTheme }) => {
 
     const [ displayValue, setDisplayValue ] = useState('0')
+    const [ displayOperationValue, setDisplayOperationValue ] = useState('')
     const [ savedValue, setSavedValue ] = useState(null)
     const [ functionCalculation, setFunctionCalculation ] = useState(null)
     const [ operator, setOperator ] = useState(null)
@@ -29,11 +30,15 @@ export const HomeComponent = ({ toggleTheme }) => {
     }
 
     function percentage(){
-        setDisplayValue(Number(displayValue) / 100 * savedValue)
+        const value = Number(displayValue) / 100 * savedValue
+        savedValue ? setDisplayValue(value) : null
+        setDisplayOperationValue(`${savedValue} ${operator} ${value} `)
     }
 
     function setPositiveOrNegative(){
-        Number(displayValue) > 0 ? setDisplayValue(-displayValue) : setDisplayValue(Math.abs(displayValue)) 
+        const value = Number(displayValue) > 0 ? -displayValue : Math.abs(displayValue)
+        setDisplayValue(value)
+        setDisplayOperationValue(`${savedValue} ${operator} ${value} `)
     }
 
     function addDigit(digit) {
@@ -41,6 +46,8 @@ export const HomeComponent = ({ toggleTheme }) => {
 
         const currentValue = cleanDisplay ? '' : displayValue
         setDisplayValue(currentValue + digit)
+
+        setDisplayOperationValue(displayOperationValue + digit)
     }
 
     function addDot() {
@@ -65,6 +72,7 @@ export const HomeComponent = ({ toggleTheme }) => {
 
         setFunctionCalculation(operations(operator))
         setDisplayValue(operator)
+        setDisplayOperationValue(displayOperationValue + ` ${operator} `)
         saveFirstValue()
     }
 
@@ -74,6 +82,7 @@ export const HomeComponent = ({ toggleTheme }) => {
 
         setDisplayValue(result.toString())
         setSavedValue(result)
+        setDisplayOperationValue(`${displayOperationValue} = ${result}`)
         setFunctionCalculation(null)
     }
 
@@ -85,6 +94,7 @@ export const HomeComponent = ({ toggleTheme }) => {
 
     function clear() {
         setDisplayValue('0')
+        setDisplayOperationValue('')
         setSavedValue(null)
         setFunctionCalculation(null)
     }
@@ -105,14 +115,14 @@ export const HomeComponent = ({ toggleTheme }) => {
                 <Icon name='moon' size={20} color={colors.colorFunctionSecondary} solid />
             </SwitchArea>
 
-            <ScreenComponent inputValue={displayValue}/>
+            <ScreenComponent resultValue={displayValue} operationValue={displayOperationValue}/>
 
             <RowButtonArea>
-                <ButtonComponent value={'C'} color={colors.colorFunctionSecondary} onPress={() => clear('C')}/>
-                <ButtonComponent value={'+/-'} color={colors.colorFunctionSecondary} onPress={setPositiveOrNegative}/>
+                <ButtonComponent value={'C'} color={colors.colorFunctionPrimary} onPress={() => clear('C')}/>
+                <ButtonComponent value={'+/-'} color={colors.colorFunctionPrimary} onPress={setPositiveOrNegative}/>
                 <ButtonComponent 
                     value={<Icon name="percentage" size={25} />} 
-                    color={colors.colorFunctionSecondary} 
+                    color={colors.colorFunctionPrimary} 
                     onPress={percentage}
                 />
                 <ButtonComponent 
@@ -152,15 +162,15 @@ export const HomeComponent = ({ toggleTheme }) => {
                 />
             </RowButtonArea>
             <RowButtonArea>
-                <ButtonComponent value={'0'} onPress={() => addDigit('0')}/>
                 <ButtonComponent value={'.'} onPress={() => addDot('.')}/>
+                <ButtonComponent value={'0'} onPress={() => addDigit('0')}/>
                 <ButtonComponent 
                     value={<Icon name="backspace" size={25} />} 
                     onPress={del}
                 />
-                <ButtonComponent 
+                <ButtonComponent
                     value={<Icon name="equals" size={25} />} 
-                    color={colors.backgroundEquals} 
+                    background={colors.backgroundEquals} 
                     onPress={() => returnResult(operator)}
                 />
             </RowButtonArea>

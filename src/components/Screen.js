@@ -1,6 +1,6 @@
 import { styled } from "styled-components/native"
 
-export const ScreenArea = styled.View`
+const ScreenArea = styled.View`
     flex: 3;
     justify-content: flex-end;
     align-items: flex-end;
@@ -8,18 +8,27 @@ export const ScreenArea = styled.View`
     padding-right: 20px;
 `
 
-export const ScreenValue = styled.TextInput`
+const ScreenResult = styled.TextInput`
     font-size: 70px;
     color: ${props => props.theme.colors.colorNumber};
 `
 
-export const ScreenComponent = ({ inputValue }) => {
+const ScreenOperation = styled.TextInput`
+    font-size: 35px;
+    color: ${props => props.theme.colors.colorNumber};
+`
+
+export const ScreenComponent = ({ resultValue, operationValue }) => {
     return(
-        <ScreenArea> 
-            <ScreenValue
+        <ScreenArea>
+            <ScreenOperation 
+                editable={false}
+                value={operationValue.toString()}
+            />
+            <ScreenResult
                 editable={false}
                 maxLength={12}
-                value={inputValue.toString()}
+                value={resultValue.toString()}
             />
         </ScreenArea>
     )
