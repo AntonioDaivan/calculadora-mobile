@@ -41,6 +41,9 @@ $ cd calculadora-mobile
 # Instalar as dependências.
 $ npm i
 
+# Iniciar o projeto.
+$ npx expo start
+
 ```
 
 ---
